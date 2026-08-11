@@ -1,0 +1,686 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- ========================================================= -->
+    <!-- DASHBOARD TITLE -->
+    <!-- ========================================================= -->
+
+    <h2 class="mb-4">Parsed Windows Security Events</h2>
+
+
+    <!-- ========================================================= -->
+    <!-- SEARCH / FILTER SECTION -->
+    <!-- ========================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <h5 class="mb-0">🔎 Event Filters</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form action="/dashboard" method="GET">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- Event ID -->
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Event ID
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="event_id"
+                            placeholder="e.g. 4625"
+                            value="{{ request.args.get('event_id', '') }}">
+
+                    </div>
+
+
+                    <!-- Level -->
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Level
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="level">
+
+                            <option
+                                value=""
+                                {% if not request.args.get('level') %}
+                                    selected
+                                {% endif %}>
+                                All Levels
+                            </option>
+
+                            <option
+                                value="Information"
+                                {% if request.args.get('level') == 'Information' %}
+                                    selected
+                                {% endif %}>
+                                Information
+                            </option>
+
+                            <option
+                                value="Warning"
+                                {% if request.args.get('level') == 'Warning' %}
+                                    selected
+                                {% endif %}>
+                                Warning
+                            </option>
+
+                            <option
+                                value="Error"
+                                {% if request.args.get('level') == 'Error' %}
+                                    selected
+                                {% endif %}>
+                                Error
+                            </option>
+
+                            <option
+                                value="Critical"
+                                {% if request.args.get('level') == 'Critical' %}
+                                    selected
+                                {% endif %}>
+                                Critical
+                            </option>
+
+                            <option
+                                value="Failure Audit"
+                                {% if request.args.get('level') == 'Failure Audit' %}
+                                    selected
+                                {% endif %}>
+                                Failure Audit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Provider -->
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Provider
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="provider"
+                            placeholder="Provider"
+                            value="{{ request.args.get('provider', '') }}">
+
+                    </div>
+
+
+                    <!-- Start Date/Time -->
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Start Date/Time
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            class="form-control"
+                            name="start_time"
+                            value="{{ request.args.get('start_time', '') }}">
+
+                    </div>
+
+
+                    <!-- End Date/Time -->
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            End Date/Time
+                        </label>
+
+                        <input
+                            type="datetime-local"
+                            class="form-control"
+                            name="end_time"
+                            value="{{ request.args.get('end_time', '') }}">
+
+                    </div>
+
+
+                    <!-- Search Button -->
+                    <div class="col-md-1">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100">
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Reset Button -->
+                    <div class="col-md-1">
+
+                        <a
+                            href="/dashboard"
+                            class="btn btn-secondary w-100">
+
+                            Reset
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- DASHBOARD STATISTICS -->
+    <!-- ========================================================= -->
+
+    <div class="row mb-4">
+
+        <!-- Total Events -->
+        <div class="col-md-3 mb-3">
+
+            <div class="card text-bg-primary h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Total Events
+                    </h5>
+
+                    <h2>
+                        {{ total_events | default(0) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Threats Detected -->
+        <div class="col-md-3 mb-3">
+
+            <div class="card text-bg-success h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Threats Detected
+                    </h5>
+
+                    <h2>
+                        {{ total_threats | default(0) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- High / Critical -->
+        <div class="col-md-3 mb-3">
+
+            <div class="card text-bg-warning h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        High / Critical
+                    </h5>
+
+                    <h2>
+                        {{ high_critical | default(0) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Unique Event IDs -->
+        <div class="col-md-3 mb-3">
+
+            <div class="card text-bg-danger h-100">
+
+                <div class="card-body">
+
+                    <h5>
+                        Unique Event IDs
+                    </h5>
+
+                    <h2>
+                        {{ unique_event_ids | default(0) }}
+                    </h2>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- THREAT SEVERITY CHART -->
+    <!-- ========================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                🛡 Threat Severity Distribution
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div
+                style="
+                    position: relative;
+                    height: 350px;
+                    width: 100%;
+                ">
+
+                <canvas id="eventChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- THREAT DETECTION SUMMARY -->
+    <!-- ========================================================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header bg-danger text-white">
+
+            <h5 class="mb-0">
+                🛡️ Threat Detection Summary
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            {% if threats %}
+
+                <div class="alert alert-danger">
+
+                    <strong>
+                        Total Threats Detected:
+                    </strong>
+
+                    {{ threats|length }}
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table
+                        class="table table-bordered table-striped table-hover">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>Event ID</th>
+
+                                <th>Threat</th>
+
+                                <th>Severity</th>
+
+                                <th>Level</th>
+
+                                <th>Time</th>
+
+                                <th>Computer</th>
+
+                                <th>Provider</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for threat in threats %}
+
+                            <tr>
+
+                                <td>
+                                    {{ threat.event_id }}
+                                </td>
+
+                                <td>
+                                    {{ threat.threat }}
+                                </td>
+
+                                <td>
+
+                                    {% if threat.severity == "Critical" %}
+
+                                        <span class="badge bg-danger">
+                                            Critical
+                                        </span>
+
+                                    {% elif threat.severity == "High" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            High
+                                        </span>
+
+                                    {% elif threat.severity == "Medium" %}
+
+                                        <span class="badge bg-info text-dark">
+                                            Medium
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-success">
+                                            Low
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ threat.level }}
+                                </td>
+
+                                <td>
+                                    {{ threat.time }}
+                                </td>
+
+                                <td>
+                                    {{ threat.computer }}
+                                </td>
+
+                                <td>
+                                    {{ threat.provider }}
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-success mb-0">
+
+                    <strong>
+                        No known security threats detected.
+                    </strong>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- PARSED EVENTS -->
+    <!-- ========================================================= -->
+
+    {% if events %}
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h4>
+                Parsed Events
+            </h4>
+
+            <span class="badge bg-primary fs-6">
+
+                {{ events|length }} Events Displayed
+
+            </span>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-bordered table-hover table-striped">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>Event ID</th>
+
+                        <th>Level</th>
+
+                        <th>Time</th>
+
+                        <th>Provider</th>
+
+                        <th>Computer</th>
+
+                        <th>Message</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for event in events %}
+
+                    <tr>
+
+                        <td>
+                            {{ event.event_id }}
+                        </td>
+
+                        <td>
+
+                            {% if event.level == "Error"
+                                or event.level == "Critical" %}
+
+                                <span class="badge bg-danger">
+                                    {{ event.level }}
+                                </span>
+
+                            {% elif event.level == "Warning" %}
+
+                                <span class="badge bg-warning text-dark">
+                                    {{ event.level }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+                                    {{ event.level }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ event.time }}
+                        </td>
+
+                        <td>
+                            {{ event.provider }}
+                        </td>
+
+                        <td>
+                            {{ event.computer }}
+                        </td>
+
+                        <td>
+                            {{ event.message }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="alert alert-warning">
+
+            No events found for the selected filters.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- CHART.JS -->
+<!-- ============================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const canvas = document.getElementById("eventChart");
+
+    if (!canvas) {
+        return;
+    }
+
+    new Chart(canvas, {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: [
+                "Critical",
+                "High",
+                "Medium",
+                "Low"
+            ],
+
+            datasets: [
+
+                {
+
+                    label: "Threats",
+
+                    data: [
+
+                        {{ critical_count | default(0) | int }},
+
+                        {{ high_count | default(0) | int }},
+
+                        {{ medium_count | default(0) | int }},
+
+                        {{ low_count | default(0) | int }}
+
+                    ],
+
+                    backgroundColor: [
+
+                        "#dc3545",
+                        "#fd7e14",
+                        "#ffc107",
+                        "#198754"
+
+                    ],
+
+                    borderWidth: 2
+
+                }
+
+            ]
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+
+                    position: "bottom"
+
+                },
+
+                tooltip: {
+
+                    enabled: true
+
+                }
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

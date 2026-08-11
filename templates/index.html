@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="text-center py-5">
+
+    <h1 class="display-4 fw-bold text-primary">
+        Secure Log Analyzer
+    </h1>
+
+    <p class="lead mt-3">
+        A web-based security log analysis and monitoring system that helps detect suspicious activities from log files.
+    </p>
+
+    <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg mt-3">
+    Upload Your First Log
+    </a>
+
+</div>
+
+<hr class="my-5">
+
+<div class="row">
+
+    <div class="col-md-3 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-body text-center">
+
+                <h3>📂</h3>
+
+                <h5>Upload Logs</h5>
+
+                <p>
+                    Upload .log or .txt files securely for analysis.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-body text-center">
+
+                <h3>🔍</h3>
+
+                <h5>Analyze Logs</h5>
+
+                <p>
+                    Parse log files and extract useful security information.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-body text-center">
+
+                <h3>⚠️</h3>
+
+                <h5>Threat Detection</h5>
+
+                <p>
+                    Detect suspicious activities using predefined security rules.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-3 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-body text-center">
+
+                <h3>📊</h3>
+
+                <h5>Reports</h5>
+
+                <p>
+                    View dashboard statistics and generate analysis reports.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

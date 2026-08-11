@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block title %}Upload Logs{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-lg">
+
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Upload Log File</h3>
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted">
+                    Upload a <strong>.log</strong> or <strong>.xml</strong> file for security analysis.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data">
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Select Log File
+        </label>
+
+        <input
+            type="file"
+            class="form-control"
+            name="logfile"
+            accept=".xml"
+            required>
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-primary">
+
+        Upload File
+
+    </button>
+
+</form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
