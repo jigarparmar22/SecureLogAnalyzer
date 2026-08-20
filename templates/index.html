@@ -1,109 +1,54 @@
 {% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
 
-{% block title %}Home{% endblock %}
+{% block title %}SecureLogAnalyzer — Security Log Analysis Platform{% endblock %}
 
 {% block content %}
-
-<div class="text-center py-5">
-
-    <h1 class="display-4 fw-bold text-primary">
-        Secure Log Analyzer
+<section class="hero">
+    <span class="hero-badge">{{ icon("shield-check", 14) }} Windows Security Event Analysis</span>
+    <h1>
+        Detect intrusions in your<br>
+        <span class="gradient-text">Windows security logs</span>
     </h1>
-
-    <p class="lead mt-3">
-        A web-based security log analysis and monitoring system that helps detect suspicious activities from log files.
+    <p class="lead">
+        Analyze Windows security logs, detect suspicious activity, and investigate
+        security events through a centralized security dashboard.
     </p>
-
-    <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg mt-3">
-    Upload Your First Log
-    </a>
-
-</div>
-
-<hr class="my-5">
-
-<div class="row">
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card shadow h-100">
-
-            <div class="card-body text-center">
-
-                <h3>📂</h3>
-
-                <h5>Upload Logs</h5>
-
-                <p>
-                    Upload .log or .txt files securely for analysis.
-                </p>
-
-            </div>
-
-        </div>
-
+    <div class="hero-actions">
+        {% if session.get("user_id") %}
+        <a class="btn btn-primary btn-lg" href="/dashboard">{{ icon("dashboard", 18) }} Open Dashboard</a>
+        <a class="btn btn-secondary btn-lg" href="/upload">{{ icon("upload", 18) }} Upload Log File</a>
+        {% else %}
+        <a class="btn btn-primary btn-lg" href="/register">{{ icon("plus", 18) }} Get Started</a>
+        <a class="btn btn-secondary btn-lg" href="/login">{{ icon("lock", 18) }} Sign In</a>
+        {% endif %}
     </div>
+</section>
 
-    <div class="col-md-3 mb-4">
+<hr class="divider">
 
-        <div class="card shadow h-100">
-
-            <div class="card-body text-center">
-
-                <h3>🔍</h3>
-
-                <h5>Analyze Logs</h5>
-
-                <p>
-                    Parse log files and extract useful security information.
-                </p>
-
-            </div>
-
+<section>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">{{ icon("database", 22) }}</div>
+            <h3>Log Analysis</h3>
+            <p>Upload Windows Event Log XML files and parse thousands of security events instantly into a searchable database.</p>
         </div>
-
-    </div>
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card shadow h-100">
-
-            <div class="card-body text-center">
-
-                <h3>⚠️</h3>
-
-                <h5>Threat Detection</h5>
-
-                <p>
-                    Detect suspicious activities using predefined security rules.
-                </p>
-
-            </div>
-
+        <div class="feature-card">
+            <div class="feature-icon">{{ icon("alert", 22) }}</div>
+            <h3>Threat Detection</h3>
+            <p>Rule-based detection of failed logins, brute-force attempts, privilege escalation, account compromise, and log tampering.</p>
         </div>
-
-    </div>
-
-    <div class="col-md-3 mb-4">
-
-        <div class="card shadow h-100">
-
-            <div class="card-body text-center">
-
-                <h3>📊</h3>
-
-                <h5>Reports</h5>
-
-                <p>
-                    View dashboard statistics and generate analysis reports.
-                </p>
-
-            </div>
-
+        <div class="feature-card">
+            <div class="feature-icon">{{ icon("activity", 22) }}</div>
+            <h3>Security Monitoring</h3>
+            <p>Monitor event activity by severity and provider through a real-time SOC-style dashboard with threat summaries.</p>
         </div>
-
+        <div class="feature-card">
+            <div class="feature-icon">{{ icon("file", 22) }}</div>
+            <h3>Reports</h3>
+            <p>Generate professional PDF security reports summarizing threat findings and parsed event data for stakeholders.</p>
+        </div>
     </div>
-
-</div>
-
+</section>
 {% endblock %}

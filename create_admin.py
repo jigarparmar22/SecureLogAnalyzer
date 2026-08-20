@@ -13,7 +13,7 @@ password_hash = generate_password_hash(password)
 
 try:
 
-    create_user(username, password_hash)
+    create_user(username, password_hash, "admin")
 
     print()
     print("User created successfully!")

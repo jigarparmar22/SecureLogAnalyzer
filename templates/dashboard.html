@@ -1,686 +1,305 @@
 {% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Security Overview — SecureLogAnalyzer{% endblock %}
 
 {% block content %}
-
-<div class="container mt-4">
-
-    <!-- ========================================================= -->
-    <!-- DASHBOARD TITLE -->
-    <!-- ========================================================= -->
-
-    <h2 class="mb-4">Parsed Windows Security Events</h2>
-
-
-    <!-- ========================================================= -->
-    <!-- SEARCH / FILTER SECTION -->
-    <!-- ========================================================= -->
-
-    <div class="card mb-4">
-
-        <div class="card-header">
-            <h5 class="mb-0">🔎 Event Filters</h5>
-        </div>
-
-        <div class="card-body">
-
-            <form action="/dashboard" method="GET">
-
-                <div class="row g-3 align-items-end">
-
-                    <!-- Event ID -->
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Event ID
-                        </label>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="event_id"
-                            placeholder="e.g. 4625"
-                            value="{{ request.args.get('event_id', '') }}">
-
-                    </div>
-
-
-                    <!-- Level -->
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Level
-                        </label>
-
-                        <select
-                            class="form-select"
-                            name="level">
-
-                            <option
-                                value=""
-                                {% if not request.args.get('level') %}
-                                    selected
-                                {% endif %}>
-                                All Levels
-                            </option>
-
-                            <option
-                                value="Information"
-                                {% if request.args.get('level') == 'Information' %}
-                                    selected
-                                {% endif %}>
-                                Information
-                            </option>
-
-                            <option
-                                value="Warning"
-                                {% if request.args.get('level') == 'Warning' %}
-                                    selected
-                                {% endif %}>
-                                Warning
-                            </option>
-
-                            <option
-                                value="Error"
-                                {% if request.args.get('level') == 'Error' %}
-                                    selected
-                                {% endif %}>
-                                Error
-                            </option>
-
-                            <option
-                                value="Critical"
-                                {% if request.args.get('level') == 'Critical' %}
-                                    selected
-                                {% endif %}>
-                                Critical
-                            </option>
-
-                            <option
-                                value="Failure Audit"
-                                {% if request.args.get('level') == 'Failure Audit' %}
-                                    selected
-                                {% endif %}>
-                                Failure Audit
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- Provider -->
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Provider
-                        </label>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            name="provider"
-                            placeholder="Provider"
-                            value="{{ request.args.get('provider', '') }}">
-
-                    </div>
-
-
-                    <!-- Start Date/Time -->
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            Start Date/Time
-                        </label>
-
-                        <input
-                            type="datetime-local"
-                            class="form-control"
-                            name="start_time"
-                            value="{{ request.args.get('start_time', '') }}">
-
-                    </div>
-
-
-                    <!-- End Date/Time -->
-                    <div class="col-md-2">
-
-                        <label class="form-label">
-                            End Date/Time
-                        </label>
-
-                        <input
-                            type="datetime-local"
-                            class="form-control"
-                            name="end_time"
-                            value="{{ request.args.get('end_time', '') }}">
-
-                    </div>
-
-
-                    <!-- Search Button -->
-                    <div class="col-md-1">
-
-                        <button
-                            type="submit"
-                            class="btn btn-primary w-100">
-
-                            Search
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- Reset Button -->
-                    <div class="col-md-1">
-
-                        <a
-                            href="/dashboard"
-                            class="btn btn-secondary w-100">
-
-                            Reset
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </form>
-
-        </div>
-
+<div class="page-header">
+    <div>
+        <h1>Security Overview</h1>
+        <p class="page-desc">Real-time view of parsed Windows security events and detected threats.</p>
     </div>
-
-
-    <!-- ========================================================= -->
-    <!-- DASHBOARD STATISTICS -->
-    <!-- ========================================================= -->
-
-    <div class="row mb-4">
-
-        <!-- Total Events -->
-        <div class="col-md-3 mb-3">
-
-            <div class="card text-bg-primary h-100">
-
-                <div class="card-body">
-
-                    <h5>
-                        Total Events
-                    </h5>
-
-                    <h2>
-                        {{ total_events | default(0) }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Threats Detected -->
-        <div class="col-md-3 mb-3">
-
-            <div class="card text-bg-success h-100">
-
-                <div class="card-body">
-
-                    <h5>
-                        Threats Detected
-                    </h5>
-
-                    <h2>
-                        {{ total_threats | default(0) }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- High / Critical -->
-        <div class="col-md-3 mb-3">
-
-            <div class="card text-bg-warning h-100">
-
-                <div class="card-body">
-
-                    <h5>
-                        High / Critical
-                    </h5>
-
-                    <h2>
-                        {{ high_critical | default(0) }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Unique Event IDs -->
-        <div class="col-md-3 mb-3">
-
-            <div class="card text-bg-danger h-100">
-
-                <div class="card-body">
-
-                    <h5>
-                        Unique Event IDs
-                    </h5>
-
-                    <h2>
-                        {{ unique_event_ids | default(0) }}
-                    </h2>
-
-                </div>
-
-            </div>
-
-        </div>
-
+    <div class="page-header-actions">
+        <a class="btn btn-primary" href="/upload">{{ icon("upload", 16) }} Upload Log</a>
     </div>
-
-
-    <!-- ========================================================= -->
-    <!-- THREAT SEVERITY CHART -->
-    <!-- ========================================================= -->
-
-    <div class="card mb-4">
-
-        <div class="card-header">
-
-            <h5 class="mb-0">
-                🛡 Threat Severity Distribution
-            </h5>
-
-        </div>
-
-        <div class="card-body">
-
-            <div
-                style="
-                    position: relative;
-                    height: 350px;
-                    width: 100%;
-                ">
-
-                <canvas id="eventChart"></canvas>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ========================================================= -->
-    <!-- THREAT DETECTION SUMMARY -->
-    <!-- ========================================================= -->
-
-    <div class="card mb-4">
-
-        <div class="card-header bg-danger text-white">
-
-            <h5 class="mb-0">
-                🛡️ Threat Detection Summary
-            </h5>
-
-        </div>
-
-
-        <div class="card-body">
-
-            {% if threats %}
-
-                <div class="alert alert-danger">
-
-                    <strong>
-                        Total Threats Detected:
-                    </strong>
-
-                    {{ threats|length }}
-
-                </div>
-
-
-                <div class="table-responsive">
-
-                    <table
-                        class="table table-bordered table-striped table-hover">
-
-                        <thead class="table-dark">
-
-                            <tr>
-
-                                <th>Event ID</th>
-
-                                <th>Threat</th>
-
-                                <th>Severity</th>
-
-                                <th>Level</th>
-
-                                <th>Time</th>
-
-                                <th>Computer</th>
-
-                                <th>Provider</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            {% for threat in threats %}
-
-                            <tr>
-
-                                <td>
-                                    {{ threat.event_id }}
-                                </td>
-
-                                <td>
-                                    {{ threat.threat }}
-                                </td>
-
-                                <td>
-
-                                    {% if threat.severity == "Critical" %}
-
-                                        <span class="badge bg-danger">
-                                            Critical
-                                        </span>
-
-                                    {% elif threat.severity == "High" %}
-
-                                        <span class="badge bg-warning text-dark">
-                                            High
-                                        </span>
-
-                                    {% elif threat.severity == "Medium" %}
-
-                                        <span class="badge bg-info text-dark">
-                                            Medium
-                                        </span>
-
-                                    {% else %}
-
-                                        <span class="badge bg-success">
-                                            Low
-                                        </span>
-
-                                    {% endif %}
-
-                                </td>
-
-                                <td>
-                                    {{ threat.level }}
-                                </td>
-
-                                <td>
-                                    {{ threat.time }}
-                                </td>
-
-                                <td>
-                                    {{ threat.computer }}
-                                </td>
-
-                                <td>
-                                    {{ threat.provider }}
-                                </td>
-
-                            </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            {% else %}
-
-                <div class="alert alert-success mb-0">
-
-                    <strong>
-                        No known security threats detected.
-                    </strong>
-
-                </div>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-
-    <!-- ========================================================= -->
-    <!-- PARSED EVENTS -->
-    <!-- ========================================================= -->
-
-    {% if events %}
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-
-            <h4>
-                Parsed Events
-            </h4>
-
-            <span class="badge bg-primary fs-6">
-
-                {{ events|length }} Events Displayed
-
-            </span>
-
-        </div>
-
-
-        <div class="table-responsive">
-
-            <table
-                class="table table-bordered table-hover table-striped">
-
-                <thead class="table-dark">
-
-                    <tr>
-
-                        <th>Event ID</th>
-
-                        <th>Level</th>
-
-                        <th>Time</th>
-
-                        <th>Provider</th>
-
-                        <th>Computer</th>
-
-                        <th>Message</th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for event in events %}
-
-                    <tr>
-
-                        <td>
-                            {{ event.event_id }}
-                        </td>
-
-                        <td>
-
-                            {% if event.level == "Error"
-                                or event.level == "Critical" %}
-
-                                <span class="badge bg-danger">
-                                    {{ event.level }}
-                                </span>
-
-                            {% elif event.level == "Warning" %}
-
-                                <span class="badge bg-warning text-dark">
-                                    {{ event.level }}
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge bg-secondary">
-                                    {{ event.level }}
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-                            {{ event.time }}
-                        </td>
-
-                        <td>
-                            {{ event.provider }}
-                        </td>
-
-                        <td>
-                            {{ event.computer }}
-                        </td>
-
-                        <td>
-                            {{ event.message }}
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-    {% else %}
-
-        <div class="alert alert-warning">
-
-            No events found for the selected filters.
-
-        </div>
-
-    {% endif %}
-
 </div>
 
+<!-- ============================================================
+     FILTERS
+     ============================================================ -->
+<div class="card mb-4">
+    <div class="card-header">
+        {{ icon("filter", 18) }}
+        Event Filters
+    </div>
+    <div class="card-body">
+        <form action="/dashboard" method="GET">
+            <div class="filter-bar">
+                <div>
+                    <label class="form-label" for="event_id">Event ID</label>
+                    <input type="text" class="form-control" id="event_id" name="event_id"
+                           placeholder="e.g. 4625" value="{{ request.args.get('event_id', '') }}">
+                </div>
+                <div>
+                    <label class="form-label" for="level">Level</label>
+                    <select class="form-select" id="level" name="level">
+                        <option value="" {% if not request.args.get('level') %}selected{% endif %}>All Levels</option>
+                        <option value="Information" {% if request.args.get('level') == 'Information' %}selected{% endif %}>Information</option>
+                        <option value="Warning" {% if request.args.get('level') == 'Warning' %}selected{% endif %}>Warning</option>
+                        <option value="Error" {% if request.args.get('level') == 'Error' %}selected{% endif %}>Error</option>
+                        <option value="Critical" {% if request.args.get('level') == 'Critical' %}selected{% endif %}>Critical</option>
+                        <option value="Failure Audit" {% if request.args.get('level') == 'Failure Audit' %}selected{% endif %}>Failure Audit</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label" for="provider">Provider</label>
+                    <input type="text" class="form-control" id="provider" name="provider"
+                           placeholder="Provider" value="{{ request.args.get('provider', '') }}">
+                </div>
+                <div>
+                    <label class="form-label" for="start_time">Start Date/Time</label>
+                    <input type="datetime-local" class="form-control" id="start_time" name="start_time"
+                           value="{{ request.args.get('start_time', '') }}">
+                </div>
+                <div>
+                    <label class="form-label" for="end_time">End Date/Time</label>
+                    <input type="datetime-local" class="form-control" id="end_time" name="end_time"
+                           value="{{ request.args.get('end_time', '') }}">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">{{ icon("search", 15) }} Search</button>
+                    <a href="/dashboard" class="btn btn-secondary">{{ icon("refresh", 15) }} Reset</a>
+                </div>
+            </div>
+        </form>
 
-<!-- ============================================================= -->
-<!-- CHART.JS -->
-<!-- ============================================================= -->
+        {% if active_filters %}
+        <div class="active-filters" aria-label="Active filters">
+            {% for label, value in active_filters %}
+            <span class="filter-chip">
+                <span class="chip-label">{{ label }}:</span> {{ value }}
+            </span>
+            {% endfor %}
+            <a href="/dashboard" class="filter-chip" style="background: var(--surface-hover); color: var(--text-secondary); text-decoration: none;">
+                {{ icon("x", 12) }} Clear all
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
+<!-- ============================================================
+     KPI STAT CARDS
+     ============================================================ -->
+<div class="stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:var(--space-4); margin-bottom:var(--space-6);">
+
+    <div class="stat-card">
+        <div class="stat-icon accent">{{ icon("database", 22) }}</div>
+        <div class="stat-content">
+            <div class="stat-label">Total Events</div>
+            <div class="stat-value">{{ total_events | default(0) }}</div>
+            <div class="stat-hint">Parsed security events</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon critical">{{ icon("alert", 22) }}</div>
+        <div class="stat-content">
+            <div class="stat-label">Threats Detected</div>
+            <div class="stat-value">{{ total_threats | default(0) }}</div>
+            <div class="stat-hint">Rule-based matches</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon high">{{ icon("alert", 22) }}</div>
+        <div class="stat-content">
+            <div class="stat-label">High / Critical</div>
+            <div class="stat-value">{{ high_critical | default(0) }}</div>
+            <div class="stat-hint">Requires attention</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon warning">{{ icon("activity", 22) }}</div>
+        <div class="stat-content">
+            <div class="stat-label">Unique Event IDs</div>
+            <div class="stat-value">{{ unique_event_ids | default(0) }}</div>
+            <div class="stat-hint">Distinct sources</div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     THREAT SEVERITY CHART
+     ============================================================ -->
+<div class="card mb-4">
+    <div class="card-header">
+        {{ icon("activity", 18) }}
+        Threat Severity Distribution
+    </div>
+    <div class="card-body">
+        <div class="chart-container">
+            <canvas id="eventChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     THREAT TABLE
+     ============================================================ -->
+<div class="section-title">
+    {{ icon("alert", 20) }}
+    <h2>Detected Threats</h2>
+    <span class="count">{{ total_threats | default(0) }}</span>
+</div>
+
+{% if threats %}
+<div class="card mb-4">
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Threat</th>
+                    <th>Severity</th>
+                    <th>Level</th>
+                    <th>Time</th>
+                    <th>Computer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for threat in threats %}
+                <tr class="{% if threat.severity == 'Critical' %}row-critical{% elif threat.severity == 'High' %}row-high{% endif %}">
+                    <td><span class="event-id">{{ threat.event_id }}</span></td>
+                    <td><strong>{{ threat.threat }}</strong></td>
+                    <td>
+                        <span class="badge-severity {{ threat.severity|lower }}">
+                            <span class="dot"></span>{{ threat.severity }}
+                        </span>
+                    </td>
+                    <td><span class="badge-level">{{ threat.level }}</span></td>
+                    <td><span class="timestamp">{{ threat.time | fmt_ts }}</span></td>
+                    <td><span class="path-value">{{ threat.computer }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state mb-4">
+    <div class="empty-state-icon">{{ icon("shield-check", 26) }}</div>
+    <h3>No Threats Detected</h3>
+    <p>No known security threats were found in the analyzed event data. Upload a log file to begin analysis.</p>
+    <a class="btn btn-primary" href="/upload">{{ icon("upload", 16) }} Upload Log</a>
+</div>
+{% endif %}
+
+<!-- ============================================================
+     PARSED EVENTS TABLE
+     ============================================================ -->
+<div class="section-title">
+    {{ icon("server", 20) }}
+    <h2>Parsed Events</h2>
+    <span class="count">{{ events|length }} / {{ total_events | default(0) }} displayed</span>
+</div>
+
+{% if events %}
+<div class="card mb-4">
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Level</th>
+                    <th>Time</th>
+                    <th>Provider</th>
+                    <th>Computer</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td><span class="event-id">{{ event.event_id }}</span></td>
+                    <td>
+                        {% if event.level in ["Error", "Critical", "Failure Audit"] %}
+                        <span class="badge-level error">{{ event.level }}</span>
+                        {% elif event.level == "Warning" %}
+                        <span class="badge-level warning-level">{{ event.level }}</span>
+                        {% else %}
+                        <span class="badge-level information">{{ event.level }}</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="timestamp">{{ event.time | fmt_ts }}</span></td>
+                    <td>{{ event.provider }}</td>
+                    <td><span class="path-value">{{ event.computer }}</span></td>
+                    <td class="message-cell">
+                        <span class="message-truncated">{{ event.message }}</span>
+                        {% if event.message and event.message|length > 120 %}
+                        <button type="button" class="message-expand" data-expand-message>Show more</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">{{ icon("search", 26) }}</div>
+    <h3>No Events Found</h3>
+    <p>No events match the current filters. Try adjusting your search or upload a new log file.</p>
+    <div class="hero-actions">
+        <a class="btn btn-primary" href="/dashboard">{{ icon("refresh", 16) }} Clear Filters</a>
+        <a class="btn btn-secondary" href="/upload">{{ icon("upload", 16) }} Upload Log</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
-
     const canvas = document.getElementById("eventChart");
-
-    if (!canvas) {
-        return;
-    }
+    if (!canvas) return;
 
     new Chart(canvas, {
-
         type: "doughnut",
-
         data: {
-
-            labels: [
-                "Critical",
-                "High",
-                "Medium",
-                "Low"
-            ],
-
-            datasets: [
-
-                {
-
-                    label: "Threats",
-
-                    data: [
-
-                        {{ critical_count | default(0) | int }},
-
-                        {{ high_count | default(0) | int }},
-
-                        {{ medium_count | default(0) | int }},
-
-                        {{ low_count | default(0) | int }}
-
-                    ],
-
-                    backgroundColor: [
-
-                        "#dc3545",
-                        "#fd7e14",
-                        "#ffc107",
-                        "#198754"
-
-                    ],
-
-                    borderWidth: 2
-
-                }
-
-            ]
-
+            labels: ["Critical", "High", "Medium", "Low"],
+            datasets: [{
+                label: "Threats",
+                data: [
+                    {{ critical_count | default(0) | int }},
+                    {{ high_count | default(0) | int }},
+                    {{ medium_count | default(0) | int }},
+                    {{ low_count | default(0) | int }}
+                ],
+                backgroundColor: ["#f87171", "#fb923c", "#facc15", "#34d399"],
+                borderColor: "#141f36",
+                borderWidth: 3,
+                hoverOffset: 6
+            }]
         },
-
-
         options: {
-
             responsive: true,
-
             maintainAspectRatio: false,
-
+            cutout: "62%",
             plugins: {
-
                 legend: {
-
-                    position: "bottom"
-
+                    position: "bottom",
+                    labels: {
+                        color: "#a8b6cc",
+                        font: { family: "Inter, system-ui, sans-serif", size: 12 },
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                        padding: 16
+                    }
                 },
-
                 tooltip: {
-
-                    enabled: true
-
+                    backgroundColor: "#0f172a",
+                    borderColor: "#223153",
+                    borderWidth: 1,
+                    titleColor: "#e6edf7",
+                    bodyColor: "#a8b6cc"
                 }
-
             }
-
         }
-
     });
-
 });
-
 </script>
-
 {% endblock %}

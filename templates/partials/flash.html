@@ -1,0 +1,19 @@
+{# Flash messages — semantic categories with icons and dismiss #}
+{% from "partials/icons.html" import icon %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-stack" role="status" aria-live="polite">
+      {% for category, message in messages %}
+        {% set cat = category if category in ['success', 'danger', 'warning', 'info'] else 'info' %}
+        {% set icon_name = 'check' if cat == 'success' else ('alert' if cat == 'danger' else ('alert' if cat == 'warning' else 'info')) %}
+        <div class="alert alert-{{ cat }}" role="alert">
+          <span class="alert-icon">{{ icon(icon_name, 18) }}</span>
+          <span class="alert-content">{{ message }}</span>
+          <button type="button" class="alert-close" data-dismiss-alert aria-label="Dismiss notification">
+            {{ icon("x", 14) }}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

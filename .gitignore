@@ -5,4 +5,10 @@ venv/
 .env
 database/logs.db
 uploads/
+reports/
 .vscode/
+.idea/
+.DS_Store
+*.log
+qa_results.txt
+qa_results.txt

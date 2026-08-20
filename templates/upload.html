@@ -1,58 +1,82 @@
 {% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
 
-{% block title %}Upload Logs{% endblock %}
+{% block title %}Log Analyzer — SecureLogAnalyzer{% endblock %}
 
 {% block content %}
-
-<div class="row justify-content-center">
-
-    <div class="col-lg-8">
-
-        <div class="card shadow-lg">
-
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">Upload Log File</h3>
-            </div>
-
-            <div class="card-body">
-
-                <p class="text-muted">
-                    Upload a <strong>.log</strong> or <strong>.xml</strong> file for security analysis.
-                </p>
-
-                <form method="POST" enctype="multipart/form-data">
-
-    <div class="mb-3">
-
-        <label class="form-label">
-            Select Log File
-        </label>
-
-        <input
-            type="file"
-            class="form-control"
-            name="logfile"
-            accept=".xml"
-            required>
-
+<div class="page-header">
+    <div>
+        <h1>Log Analyzer</h1>
+        <p class="page-desc">Upload a Windows Security Event XML log file for analysis and threat detection.</p>
     </div>
-
-    <button
-        type="submit"
-        class="btn btn-primary">
-
-        Upload File
-
-    </button>
-
-</form>
-
-            </div>
-
-        </div>
-
-    </div>
-
 </div>
 
+<div class="card">
+    <div class="card-header">
+        {{ icon("upload", 18) }}
+        Upload Security Log
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <label class="dropzone" for="logfile" id="dropzone">
+                <span class="dropzone-icon">{{ icon("upload", 28) }}</span>
+                <h3>Drop your security log here</h3>
+                <p>or click to browse files</p>
+                <span class="hint">Accepted format: <strong>.xml</strong> (Windows Event Log · max 100 MB)</span>
+                <input type="file" class="form-control" id="logfile" name="logfile"
+                       accept=".xml" required hidden>
+            </label>
+
+            <div class="file-selected" id="fileSelected">
+                <span class="alert-icon">{{ icon("check", 18) }}</span>
+                <span class="file-name" id="fileName"></span>
+                <button type="button" class="alert-close" id="clearFile" aria-label="Remove selected file">
+                    {{ icon("x", 14) }}
+                </button>
+            </div>
+
+            <div class="upload-progress" id="uploadProgress">
+                <div class="progress-track">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">Uploading…</div>
+            </div>
+
+            <div class="form-gap"></div>
+
+            <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                <span class="btn-label">{{ icon("activity", 16) }} Analyze Log</span>
+                <span class="spinner" style="display:none" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('logfile').click()">
+                {{ icon("file", 16) }} Browse
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="section-title" style="margin-top: var(--space-6);">
+    {{ icon("info", 20) }}
+    <h2>Analysis Workflow</h2>
+</div>
+
+<div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("upload", 20) }}</div>
+        <h3>1. Upload</h3>
+        <p>Select a Windows Event Log XML export containing security events.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("activity", 20) }}</div>
+        <h3>2. Analyze</h3>
+        <p>Events are parsed and evaluated against built-in threat-detection rules.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("shield-check", 20) }}</div>
+        <h3>3. Investigate</h3>
+        <p>Review detected threats, severity distribution, and event details on the dashboard.</p>
+    </div>
+</div>
 {% endblock %}

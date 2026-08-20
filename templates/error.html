@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
+
+{% block title %}Error {{ code }} — SecureLogAnalyzer{% endblock %}
+
+{% block content %}
+<div class="empty-state" style="min-height: 60vh; justify-content: center;">
+    <div class="empty-state-icon" style="color: var(--danger); background: var(--danger-soft);">
+        {{ icon("alert", 28) }}
+    </div>
+    <h1 style="font-size: 2.5rem; margin-bottom: var(--space-2);">{{ code }}</h1>
+    <h3>{{ message }}</h3>
+    <p>The requested operation could not be completed.</p>
+    <div class="hero-actions">
+        <a class="btn btn-primary" href="/">{{ icon("home", 16) }} Go Home</a>
+        {% if session.get("user_id") %}
+        <a class="btn btn-secondary" href="/dashboard">{{ icon("dashboard", 16) }} Dashboard</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

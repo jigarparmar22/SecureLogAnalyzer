@@ -1,0 +1,21 @@
+{# Topbar — page title, breadcrumb, user chip, mobile toggle #}
+{% from "partials/icons.html" import icon %}
+
+<header class="topbar">
+    <button class="btn-icon sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+        {{ icon("menu", 20) }}
+    </button>
+    <div class="topbar-title">
+        <h1>{{ page_title|default("SecureLogAnalyzer") }}</h1>
+        {% if breadcrumb %}
+        <span class="breadcrumb">{{ breadcrumb }}</span>
+        {% endif %}
+    </div>
+    <div class="topbar-spacer"></div>
+    {% if session.get("user_id") %}
+    <div class="user-chip">
+        <span class="user-avatar" aria-hidden="true">{{ session.get("username", "?")[0]|upper }}</span>
+        <span class="user-username">{{ session.get("username") }}</span>
+    </div>
+    {% endif %}
+</header>

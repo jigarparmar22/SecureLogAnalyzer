@@ -1,0 +1,93 @@
+{# =====================================================================
+   Sidebar — server-side role-gated navigation.
+   Uses request.path to highlight the active item.
+   ===================================================================== #}
+{% from "partials/icons.html" import icon %}
+{% set current = request.path %}
+
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-brand">
+        <a href="/" class="brand-mark" aria-label="SecureLogAnalyzer home">
+            {{ icon("shield-check", 20) }}
+        </a>
+        <div>
+            <span class="brand-name">SecureLogAnalyzer</span>
+            <span class="brand-tagline">Security Operations</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <span class="nav-section-title">Overview</span>
+            <a class="nav-item {% if current == '/' %}active{% endif %}" href="/" {% if current == '/' %}aria-current="page"{% endif %}>
+                {{ icon("home", 18) }}
+                <span>Home</span>
+            </a>
+            {% if session.get("user_id") %}
+            <a class="nav-item {% if current == '/dashboard' %}active{% endif %}" href="/dashboard" {% if current == '/dashboard' %}aria-current="page"{% endif %}>
+                {{ icon("dashboard", 18) }}
+                <span>Dashboard</span>
+            </a>
+            {% endif %}
+        </div>
+
+        {% if session.get("user_id") %}
+        <div class="nav-section">
+            <span class="nav-section-title">Analysis</span>
+            <a class="nav-item {% if current == '/upload' %}active{% endif %}" href="/upload" {% if current == '/upload' %}aria-current="page"{% endif %}>
+                {{ icon("upload", 18) }}
+                <span>Log Analyzer</span>
+            </a>
+            <a class="nav-item {% if current == '/reports' %}active{% endif %}" href="/reports" {% if current == '/reports' %}aria-current="page"{% endif %}>
+                {{ icon("file", 18) }}
+                <span>Reports</span>
+            </a>
+        </div>
+        {% endif %}
+
+        {% if session.get("role") == "admin" %}
+        <div class="nav-section">
+            <span class="nav-section-title">Administration</span>
+            <a class="nav-item {% if current == '/admin/users' %}active{% endif %}" href="/admin/users" {% if current == '/admin/users' %}aria-current="page"{% endif %}>
+                {{ icon("users", 18) }}
+                <span>User Management</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="nav-section">
+            <span class="nav-section-title">Support</span>
+            <a class="nav-item {% if current == '/about' %}active{% endif %}" href="/about" {% if current == '/about' %}aria-current="page"{% endif %}>
+                {{ icon("info", 18) }}
+                <span>About</span>
+            </a>
+        </div>
+
+        {% if session.get("user_id") %}
+        <div class="nav-section">
+            <span class="nav-section-title">Account</span>
+            <a class="nav-item {% if current == '/account' %}active{% endif %}" href="/account" {% if current == '/account' %}aria-current="page"{% endif %}>
+                {{ icon("user", 18) }}
+                <span>Profile</span>
+            </a>
+            <a class="nav-item {% if current == '/change-password' %}active{% endif %}" href="/change-password" {% if current == '/change-password' %}aria-current="page"{% endif %}>
+                {{ icon("key", 18) }}
+                <span>Change Password</span>
+            </a>
+            <form method="POST" action="/logout" class="nav-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="nav-item nav-button">
+                    {{ icon("logout", 18) }}
+                    <span>Logout</span>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+        <span class="live-indicator"><span class="pulse-dot"></span> System Online</span>
+    </div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

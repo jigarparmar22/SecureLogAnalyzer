@@ -1,0 +1,26 @@
+{# Auth layout — full-screen centered, no sidebar. Extend layout.html and override the shell block. #}
+{% extends "layout.html" %}
+
+{% block shell %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a href="/" class="brand-mark" aria-label="SecureLogAnalyzer home">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                </svg>
+            </a>
+            <h1>{% block auth_title %}SecureLogAnalyzer{% endblock %}</h1>
+            <p>{% block auth_subtitle %}Security log analysis and monitoring platform{% endblock %}</p>
+        </div>
+        <div class="auth-body">
+            {% include "partials/flash.html" %}
+            {% block auth_content %}{% endblock %}
+        </div>
+        <div class="auth-footer">
+            {% block auth_footer %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

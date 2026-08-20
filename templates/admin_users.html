@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
+
+{% block title %}User Management — SecureLogAnalyzer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>User Management</h1>
+        <p class="page-desc">Manage registered SecureLogAnalyzer accounts and their access.</p>
+    </div>
+</div>
+
+{% if users %}
+<div class="card">
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><span class="event-id">{{ user.id }}</span></td>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>
+                        <span class="badge-role {% if user.role == 'admin' %}admin{% else %}user{% endif %}">
+                            {% if user.role == 'admin' %}Administrator{% else %}User{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge-status {% if user.is_active %}active{% else %}disabled{% endif %}">
+                            {% if user.is_active %}Active{% else %}Disabled{% endif %}
+                        </span>
+                    </td>
+                    <td><span class="timestamp">{{ user.created_at or "N/A" }}</span></td>
+                    <td><span class="timestamp">{{ user.last_login or "Never" }}</span></td>
+                    <td>
+                        {% if user.id == session["user_id"] %}
+                        <span class="muted">Current account</span>
+                        {% else %}
+                        <div class="filter-actions" style="gap: var(--space-2); flex-wrap: wrap;">
+                            <a class="btn btn-secondary btn-sm" href="/admin/users/{{ user.id }}/reset-password">
+                                {{ icon("key", 14) }} Reset
+                            </a>
+                            {% if user.is_active %}
+                            <form method="POST" action="/admin/users/{{ user.id }}/deactivate"
+                                  class="d-inline" onsubmit="return confirm('Deactivate this user account?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-warning btn-sm">{{ icon("lock", 14) }} Deactivate</button>
+                            </form>
+                            {% else %}
+                            <form method="POST" action="/admin/users/{{ user.id }}/activate" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success btn-sm">{{ icon("shield-check", 14) }} Activate</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="/admin/users/{{ user.id }}/delete"
+                                  class="d-inline" onsubmit="return confirm('PERMANENTLY delete this user? This cannot be undone.');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm">{{ icon("trash", 14) }} Delete</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-state-icon">{{ icon("users", 26) }}</div>
+    <h3>No Users Found</h3>
+    <p>There are no registered users yet.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
+
+{% block title %}My Account — SecureLogAnalyzer{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>My Account</h1>
+        <p class="page-desc">Manage your SecureLogAnalyzer account information.</p>
+    </div>
+    <div class="page-header-actions">
+        <a class="btn btn-secondary" href="/change-password">{{ icon("key", 16) }} Change Password</a>
+        <form method="POST" action="/logout" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger">{{ icon("logout", 16) }} Logout</button>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        {{ icon("user", 18) }}
+        Profile
+    </div>
+    <div class="card-body">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Username</div>
+                <div class="detail-value">{{ user.username }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Role</div>
+                <div class="detail-value">
+                    <span class="badge-role {% if user.role == 'admin' %}admin{% else %}user{% endif %}">
+                        {% if user.role == 'admin' %}Administrator{% else %}Standard User{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Account Status</div>
+                <div class="detail-value">
+                    <span class="badge-status {% if user.is_active %}active{% else %}disabled{% endif %}">
+                        {% if user.is_active %}Active{% else %}Disabled{% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Account Created</div>
+                <div class="detail-value">{{ user.created_at or "N/A" }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Last Login</div>
+                <div class="detail-value">{{ user.last_login or "Never" }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        {{ icon("settings", 18) }}
+        Account Actions
+    </div>
+    <div class="card-body">
+        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            <div class="feature-card">
+                <div class="feature-icon">{{ icon("key", 20) }}</div>
+                <h3>Update Password</h3>
+                <p>Change your password to maintain account security. You will be logged out after changing it.</p>
+                <a class="btn btn-secondary btn-sm" href="/change-password">Update Password</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">{{ icon("logout", 20) }}</div>
+                <h3>Sign Out</h3>
+                <p>End your current session securely. You'll need to sign in again to access the dashboard.</p>
+                <form method="POST" action="/logout">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-secondary btn-sm">Sign Out</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

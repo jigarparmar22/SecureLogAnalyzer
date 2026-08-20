@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as DET
 
 NAMESPACE = {
     "ns": "http://schemas.microsoft.com/win/2004/08/events/event"
@@ -6,7 +6,20 @@ NAMESPACE = {
 
 
 def parse_xml_log(filepath):
-    tree = ET.parse(filepath)
+    """
+    Parse a Windows Event XML log file into a list of event dictionaries.
+
+    Uses defusedxml to safely parse untrusted XML, preventing
+    XXE / entity-expansion attacks. Raises ValueError on malformed
+    or unsafe XML so callers can surface a friendly error.
+    """
+    try:
+        tree = DET.parse(filepath)
+    except Exception as error:
+        raise ValueError(
+            "The uploaded file is not a valid or safe XML document."
+        ) from error
+
     root = tree.getroot()
 
     events = []

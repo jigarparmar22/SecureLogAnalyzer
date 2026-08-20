@@ -1,11 +1,66 @@
 {% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
 
-{% block title %}
-Reports
-{% endblock %}
+{% block title %}Reports — SecureLogAnalyzer{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div>
+        <h1>Security Reports</h1>
+        <p class="page-desc">Generate professional PDF reports from the currently analyzed log data.</p>
+    </div>
+</div>
 
-<h2>Reports Page</h2>
+<div class="card mb-4">
+    <div class="card-header">
+        {{ icon("file", 18) }}
+        Report Generator
+    </div>
+    <div class="card-body">
+        <div class="detail-grid mb-4">
+            <div class="detail-item">
+                <div class="detail-label">Events Analyzed</div>
+                <div class="detail-value">{{ total_events | default(0) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Threats Detected</div>
+                <div class="detail-value">{{ total_threats | default(0) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Critical</div>
+                <div class="detail-value" style="color: var(--critical)">{{ critical_count | default(0) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">High</div>
+                <div class="detail-value" style="color: var(--high)">{{ high_count | default(0) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Medium</div>
+                <div class="detail-value" style="color: var(--medium)">{{ medium_count | default(0) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Low</div>
+                <div class="detail-value" style="color: var(--low)">{{ low_count | default(0) }}</div>
+            </div>
+        </div>
 
+        {% if total_events and total_events > 0 %}
+        <form method="POST" action="/reports" id="reportForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary" id="generateBtn">
+                <span class="btn-label">{{ icon("download", 16) }} Generate PDF Report</span>
+                <span class="spinner" style="display:none" aria-hidden="true"></span>
+            </button>
+        </form>
+        <div class="form-text mt-2">The report includes the analysis summary, detected threats, and up to 500 parsed events.</div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">{{ icon("file", 26) }}</div>
+            <h3>No Data Available</h3>
+            <p>Upload a log file first to generate a security report.</p>
+            <a class="btn btn-primary" href="/upload">{{ icon("upload", 16) }} Upload Log</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

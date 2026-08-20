@@ -1,11 +1,94 @@
 {% extends "layout.html" %}
+{% from "partials/icons.html" import icon %}
 
-{% block title %}
-About
-{% endblock %}
+{% block title %}About — SecureLogAnalyzer{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <div>
+        <h1>About SecureLogAnalyzer</h1>
+        <p class="page-desc">A Windows security log analysis and threat-detection platform.</p>
+    </div>
+</div>
 
-<h2>About Page</h2>
+<section class="hero" style="text-align: left; padding: 0 0 var(--space-8); max-width: 100%;">
+    <p>
+        SecureLogAnalyzer is a web-based security log analysis and monitoring system that helps
+        security analysts and system administrators detect suspicious activity from Windows security
+        event logs. Upload a Windows Event Log XML export, and the platform parses each event,
+        applies rule-based threat detection, and presents the findings through a centralized
+        security dashboard.
+    </p>
+</section>
 
+<hr class="divider">
+
+<div class="section-title">
+    {{ icon("shield", 20) }}
+    <h2>Threat Detection Capabilities</h2>
+</div>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("alert", 22) }}</div>
+        <h3>Event-ID Rule Engine</h3>
+        <p>Flags known security-relevant Windows event IDs including failed logins, privilege assignments, and account modifications.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("activity", 22) }}</div>
+        <h3>Brute-Force Detection</h3>
+        <p>Identifies possible brute-force attacks by detecting repeated failed login attempts within a configurable time window.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("key", 22) }}</div>
+        <h3>Compromise Detection</h3>
+        <p>Detects successful logins shortly after a burst of failed attempts — a strong indicator of account compromise.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("shield", 22) }}</div>
+        <h3>Privilege Escalation</h3>
+        <p>Correlates new account creation with subsequent privilege or group-membership changes.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">{{ icon("server", 22) }}</div>
+        <h3>Log Tampering</h3>
+        <p>Flags security log clearing that follows suspicious activity — a potential anti-forensics technique.</p>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="section-title">
+    {{ icon("database", 20) }}
+    <h2>Supported Log Format</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <p>The platform currently accepts <strong>Windows Event Log XML exports</strong> (<code>.xml</code>).
+        The parser handles the standard Microsoft Windows Eventing namespace, including events with
+        <code>RenderingInfo</code> rendering data containing human-readable level and message fields.</p>
+        <div class="form-text">Maximum upload size: 100 MB.</div>
+    </div>
+</div>
+
+<hr class="divider">
+
+<div class="section-title">
+    {{ icon("settings", 20) }}
+    <h2>Technology Stack</h2>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary);">
+            <li><strong>Backend:</strong> Python / Flask</li>
+            <li><strong>Database:</strong> SQLite</li>
+            <li><strong>Reporting:</strong> ReportLab (PDF generation)</li>
+            <li><strong>Frontend:</strong> Server-rendered Jinja2 templates with a custom dark design system</li>
+            <li><strong>Charts:</strong> Chart.js</li>
+            <li><strong>Security:</strong> Werkzeug password hashing, account lockout, CSRF protection, hardened XML parsing</li>
+        </ul>
+    </div>
+</div>
 {% endblock %}
